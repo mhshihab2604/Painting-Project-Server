@@ -79,6 +79,16 @@ async function run() {
         const result = await cursor.toArray();
         res.send(result);
     })
+    app.get("/category/:id", async(req, res)=> {
+      const {id} = req.params
+      const category = id.split('&').join(' ')
+      
+        const cursor = paintingCollection.find({
+          subcategory_name:category
+          })
+        const result = await cursor.toArray();
+        res.send(result);
+    })
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
