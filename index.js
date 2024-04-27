@@ -3,7 +3,7 @@ const cors = require('cors');
 require('dotenv').config()
 const app = express();
 const port = process.env.PORT || 5000;
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 
 // middleware
 app.use(cors());
@@ -28,20 +28,57 @@ async function run() {
     await client.connect();
 
     const paintingCollection = client.db('paintingDB').collection('painting');
+    const categoryCollection = client.db('paintingDB').collection('category');
 
     app.get("/painting", async(req, res)=> {
         const cursor = paintingCollection.find()
         const result = await cursor.toArray();
         res.send(result);
-    })
+    });
+
+    app.get("/painting/:id", async(req, res) => {
+      const id = req.params.id;
+      const query = {_id: new ObjectId(id)}
+      const result = await paintingCollection.findOne(query);
+      res.send(result);
+    });
 
     app.post('/painting', async(req, res) => {
         const newCraft = req.body;
         console.log(newCraft);
         const result = await paintingCollection.insertOne(newCraft);
         res.send(result);
-    })
+    });
 
+    app.put("/painting/:id", async(req, res) => {
+      const id = req.params.id;
+      const filter = {_id: new ObjectId(id)}
+      const options = {upsert: true};
+      const updateCraft = req.body;
+      const painting = {
+          $set: {
+            name: updateCraft.name, 
+            email: updateCraft.email,
+            item_name: updateCraft.item_name,
+            subcategory_name: updateCraft.subcategory_name ,
+            customization: updateCraft.customization ,
+            stock: updateCraft.stock ,
+            processing_time: updateCraft.processing_time ,
+            price: updateCraft.price ,
+            rating: updateCraft.rating ,
+            short_description: updateCraft.short_description ,
+            image: updateCraft.image 
+          }
+      }
+      const result = await paintingCollection.updateOne(filter, painting, options);
+      res.send(result);
+    });
+    // -------------------------------
+    app.get("/category", async(req, res)=> {
+        const cursor = categoryCollection.find()
+        const result = await cursor.toArray();
+        res.send(result);
+    })
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
