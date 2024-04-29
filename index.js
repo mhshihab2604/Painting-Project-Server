@@ -29,6 +29,7 @@ async function run() {
 
     const paintingCollection = client.db('paintingDB').collection('painting');
     const categoryCollection = client.db('paintingDB').collection('category');
+    const userCraftCollection = client.db('paintingDB').collection('userCraft');
 
     app.get("/painting", async(req, res)=> {
         const cursor = paintingCollection.find()
@@ -42,7 +43,42 @@ async function run() {
       const result = await paintingCollection.findOne(query);
       res.send(result);
     });
-
+    // --------------
+    // app.get("/userCraft/:email", async(req, res) => {
+    //   const email = req.params.email;
+    //   const query = {email: email}
+    //   const result = await userCraftCollection.findOne(query);
+    //   res.send(result);
+    // });
+    // app.post('/userCraft', async(req, res) => {
+    //   const {body} = req;
+    //   const result = await userCraftCollection.insertOne(body);
+    //   res.send(result);
+    // })
+    app.get("/userCraft/:email", async (req, res) => {
+      try {
+        const email = req.params.email;
+        const query = { email: email };
+        const results = await userCraftCollection.find(query).toArray();
+        res.send(results);
+      } catch (error) {
+        console.error("Error fetching userCraft:", error);
+        res.status(500).send("Internal Server Error");
+      }
+    });
+    
+    app.post("/userCraft", async (req, res) => {
+      try {
+        const { body } = req;
+        const result = await userCraftCollection.insertOne(body);
+        res.send(result);
+      } catch (error) {
+        console.error("Error inserting userCraft:", error);
+        res.status(500).send("Internal Server Error");
+      }
+    });
+    
+    // ---------------
     app.post('/painting', async(req, res) => {
         const newCraft = req.body;
         console.log(newCraft);
