@@ -36,14 +36,12 @@ async function run() {
         const result = await cursor.toArray();
         res.send(result);
     });
-
     app.get("/painting/:id", async(req, res) => {
       const id = req.params.id;
       const query = {_id: new ObjectId(id)}
       const result = await paintingCollection.findOne(query);
       res.send(result);
     });
-    
     // --------------
     // app.get("/userCraft/:email", async(req, res) => {
     //   const email = req.params.email;
@@ -135,6 +133,30 @@ async function run() {
       res.send(result)
     });
     // -----------------------
+
+    app.put("/userCraft/:id", async(req, res) => {
+      const id = req.params.id;
+      const filter = {_id: new ObjectId(id)}
+      const options = {upsert: true};
+      const updateCraft = req.body;
+      const userCraft = {
+          $set: {
+            name: updateCraft.name, 
+            email: updateCraft.email,
+            item_name: updateCraft.item_name,
+            subcategory_name: updateCraft.subcategory_name ,
+            customization: updateCraft.customization ,
+            stock: updateCraft.stock ,
+            processing_time: updateCraft.processing_time ,
+            price: updateCraft.price ,
+            rating: updateCraft.rating ,
+            short_description: updateCraft.short_description ,
+            image: updateCraft.image 
+          }
+      }
+      const result = await userCraftCollection.updateOne(filter, userCraft, options);
+      res.send(result);
+    });
     app.get("/painting/:id", async(req, res)=> {
       const id = req.params.id;
       const query = {_id: new ObjectId(id)}
@@ -160,3 +182,8 @@ app.get('/', (req, res) => {
 app.listen(port, () => {
     console.log(`Web Server is running on port: ${port}`);
 })
+
+
+
+// Await Client.Connect();
+// Await Client.Db("Admin").Command({ Ping: 1 });
