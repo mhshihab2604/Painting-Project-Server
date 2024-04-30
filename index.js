@@ -43,6 +43,7 @@ async function run() {
       const result = await paintingCollection.findOne(query);
       res.send(result);
     });
+    
     // --------------
     // app.get("/userCraft/:email", async(req, res) => {
     //   const email = req.params.email;
@@ -55,6 +56,8 @@ async function run() {
     //   const result = await userCraftCollection.insertOne(body);
     //   res.send(result);
     // })
+
+    // --------MyCraft---------
     app.get("/userCraft/:email", async (req, res) => {
       try {
         const email = req.params.email;
@@ -77,8 +80,7 @@ async function run() {
         res.status(500).send("Internal Server Error");
       }
     });
-    
-    // ---------------
+    // -----------------------
     app.post('/painting', async(req, res) => {
         const newCraft = req.body;
         console.log(newCraft);
@@ -125,6 +127,20 @@ async function run() {
         const result = await cursor.toArray();
         res.send(result);
     })
+    // --------Delete---------
+    app.delete("/userCraft/:id", async(req, res) => {
+      const id = req.params.id;
+      const query = {_id: new ObjectId(id)}
+      const result = await userCraftCollection.deleteOne(query);
+      res.send(result)
+    });
+    // -----------------------
+    app.get("/painting/:id", async(req, res)=> {
+      const id = req.params.id;
+      const query = {_id: new ObjectId(id)}
+      const result = await paintingCollection.findOne(query);
+      res.send(result);
+  })
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
